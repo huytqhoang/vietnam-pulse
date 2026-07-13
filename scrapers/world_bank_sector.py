@@ -13,6 +13,11 @@ INDICATORS = {
     "NV.IND.MANF.ZS":   ("wb_manufacturing_pct_gdp", "% of GDP",    "Manufacturing value added % of GDP"),
     "NV.IND.TOTL.ZS":   ("wb_industry_pct_gdp",      "% of GDP",    "Industry value added % of GDP"),
     "SL.TLF.TOTL.IN":   ("wb_labor_force_total",     "persons",     "Total labor force"),
+    # Employment status — the informal/gig economy picture
+    "SL.EMP.SELF.ZS":   ("wb_self_employed_pct",     "% of total",  "Self-employed % (informal, gig, own-account)"),
+    "SL.EMP.WORK.ZS":   ("wb_wage_worker_pct",       "% of total",  "Wage & salaried workers % (formal employment)"),
+    "SL.EMP.VULN.ZS":   ("wb_vulnerable_employ_pct", "% of total",  "Vulnerable employment % (no contract/protection)"),
+    "SL.FAM.WORK.ZS":   ("wb_family_worker_pct",     "% of total",  "Contributing family workers % (unpaid family labor)"),
 }
 
 def _wb_get(indicator: str) -> list:

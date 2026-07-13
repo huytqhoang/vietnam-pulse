@@ -18,6 +18,11 @@ const METRICS = [
   "wb_employ_agri_pct",
   "wb_manufacturing_pct_gdp",
   "wb_youth_unemployment",
+  // Employment status (formal vs informal)
+  "wb_self_employed_pct",
+  "wb_wage_worker_pct",
+  "wb_vulnerable_employ_pct",
+  "wb_family_worker_pct",
   // Jobs
   "itviec_total_it_jobs",
 ];

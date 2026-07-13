@@ -62,6 +62,12 @@ export default function Dashboard({ data, squeeze }: Props) {
   const youthUnemp   = latest(data["wb_youth_unemployment"]);
   const itJobs       = latest(data["itviec_total_it_jobs"]);
 
+  // Formal vs informal
+  const selfEmployed = latest(data["wb_self_employed_pct"]);
+  const wageWorkers  = latest(data["wb_wage_worker_pct"]);
+  const vulnerable   = latest(data["wb_vulnerable_employ_pct"]);
+  const familyWork   = latest(data["wb_family_worker_pct"]);
+
   // Trend deltas
   const vnIdxChange = weekChange(data["vn_index_close"]);
   const usdChange   = weekChange(data["usd_vnd_sell"]);
@@ -249,6 +255,25 @@ export default function Dashboard({ data, squeeze }: Props) {
               interpretationEn="Samsung, Intel, LG are still building factories in Vietnam. But local people are shifting savings to gold. Who's right about Vietnam's future — foreign investors or local residents?"
               lang={lang}
             />
+
+            <InsightCard
+              tension="warns"
+              headlineVi="53% người Việt tự làm chủ — phần lớn không có lưới bảo vệ"
+              headlineEn="53% of Vietnamese are self-employed — most with no safety net"
+              left={{
+                label: lang === "vi" ? "Tự làm / Phi chính thức" : "Self-employed / Informal",
+                value: selfEmployed ? `${selfEmployed.toFixed(0)}%` : "53%",
+                sub: lang === "vi" ? "xe ôm, tiệm tạp hóa, nông dân..." : "drivers, shops, farmers..."
+              }}
+              right={{
+                label: lang === "vi" ? "Việc làm dễ tổn thương" : "Vulnerable employment",
+                value: vulnerable ? `${vulnerable.toFixed(0)}%` : "51%",
+                sub: lang === "vi" ? "không hợp đồng, không BHXH" : "no contract, no social security"
+              }}
+              interpretationVi="Khi kinh tế khó khăn, nhóm này bị ảnh hưởng đầu tiên và nặng nhất — không có trợ cấp thất nghiệp, không có lương cơ bản. Grab driver, chủ xe ôm, bán hàng rong: đây là đa số người lao động Việt Nam."
+              interpretationEn="When the economy slows, this group gets hit first and hardest — no unemployment benefits, no minimum wage protection. Grab drivers, xe ôm owners, street vendors: this is the majority of Vietnam's workforce."
+              lang={lang}
+            />
           </div>
         </section>
 
@@ -271,6 +296,84 @@ export default function Dashboard({ data, squeeze }: Props) {
               {lang === "vi" ? "Cơ cấu lao động Việt Nam (2025)" : "Vietnam Labor Structure (2025)"}
             </p>
             <SectorBar sectors={sectors} lang={lang} />
+          </div>
+
+          {/* Formal vs Informal breakdown */}
+          <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-5 space-y-4">
+            <p className="text-xs text-zinc-500 uppercase tracking-wide">
+              {lang === "vi" ? "Cơ cấu việc làm — chính thức vs phi chính thức (2025)" : "Employment structure — formal vs informal (2025)"}
+            </p>
+
+            <div className="grid grid-cols-2 gap-3">
+              {[
+                {
+                  pct: selfEmployed ?? 53.4,
+                  label: lang === "vi" ? "Tự làm chủ" : "Self-employed",
+                  sub: lang === "vi" ? "Grab, xe ôm, tạp hóa, nông dân" : "Grab, xe ôm, shops, farmers",
+                  color: "bg-orange-500",
+                  ring: "ring-orange-800",
+                  icon: "🛵",
+                },
+                {
+                  pct: wageWorkers ?? 46.7,
+                  label: lang === "vi" ? "Làm công ăn lương" : "Wage workers",
+                  sub: lang === "vi" ? "Nhà máy, văn phòng, dịch vụ" : "Factories, offices, services",
+                  color: "bg-blue-500",
+                  ring: "ring-blue-800",
+                  icon: "🏢",
+                },
+                {
+                  pct: vulnerable ?? 51.4,
+                  label: lang === "vi" ? "Việc làm dễ tổn thương" : "Vulnerable employment",
+                  sub: lang === "vi" ? "Không HĐ, không BHXH" : "No contract, no social security",
+                  color: "bg-red-600",
+                  ring: "ring-red-900",
+                  icon: "⚠️",
+                },
+                {
+                  pct: familyWork ?? 12.0,
+                  label: lang === "vi" ? "Lao động gia đình" : "Family workers",
+                  sub: lang === "vi" ? "Không lương, hỗ trợ người thân" : "Unpaid, helping relatives",
+                  color: "bg-zinc-500",
+                  ring: "ring-zinc-700",
+                  icon: "👨‍👩‍👧",
+                },
+              ].map(({ pct, label, sub, color, ring, icon }) => (
+                <div key={label} className={`rounded-lg border ${ring} bg-zinc-950/60 p-3`}>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-base">{icon}</span>
+                    <span className={`text-xl font-black text-white`}>{pct.toFixed(0)}%</span>
+                  </div>
+                  {/* mini bar */}
+                  <div className="w-full bg-zinc-800 rounded-full h-1.5 mb-2">
+                    <div className={`${color} h-1.5 rounded-full`} style={{ width: `${pct}%` }} />
+                  </div>
+                  <p className="text-xs font-medium text-zinc-300">{label}</p>
+                  <p className="text-xs text-zinc-600 mt-0.5">{sub}</p>
+                </div>
+              ))}
+            </div>
+
+            <p className="text-xs text-zinc-600 border-t border-zinc-800 pt-3">
+              {lang === "vi"
+                ? "Nguồn: World Bank / ILO 2025 · Lưu ý: \"việc làm dễ tổn thương\" gồm tự làm chủ phi chính thức + lao động gia đình"
+                : "Source: World Bank / ILO 2025 · Note: \"vulnerable employment\" includes informal self-employed + unpaid family workers"}
+            </p>
+          </div>
+
+          {/* Platform / gig economy callout */}
+          <div className="rounded-xl border border-zinc-700 bg-zinc-900/50 p-4 flex gap-4 items-start">
+            <span className="text-3xl shrink-0">🛵</span>
+            <div>
+              <p className="text-sm font-semibold text-white">
+                {lang === "vi" ? "Grab / Be / xe ôm công nghệ: ~400.000–600.000 tài xế" : "Grab / Be / ride-hailing: ~400K–600K drivers"}
+              </p>
+              <p className="text-xs text-zinc-500 mt-1 leading-relaxed">
+                {lang === "vi"
+                  ? "Grab báo cáo ~250.000 tài xế đang hoạt động (2023-2024). Be khoảng 200.000. Xe ôm truyền thống ước tính 1–2 triệu. Không có API công khai — số liệu từ thông cáo báo chí của công ty."
+                  : "Grab reported ~250K active drivers (2023-24). Be ~200K. Traditional xe ôm estimated 1-2M. No public API — figures from company press releases."}
+              </p>
+            </div>
           </div>
 
           {/* Sector job cards */}
