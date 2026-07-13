@@ -38,6 +38,20 @@ def run():
     except Exception as e:
         print(f"  ERROR: {e}")
 
+    print("\n=== SCRAPING: World Bank sector employment ===")
+    try:
+        import world_bank_sector
+        world_bank_sector.scrape()
+    except Exception as e:
+        print(f"  ERROR: {e}")
+
+    print("\n=== SCRAPING: itviec IT jobs ===")
+    try:
+        import itviec_jobs
+        itviec_jobs.scrape()
+    except Exception as e:
+        print(f"  ERROR: {e}")
+
     print("\n" + "="*50)
     print("SUMMARY — latest values in DB")
     print("="*50)

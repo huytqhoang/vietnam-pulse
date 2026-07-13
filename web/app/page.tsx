@@ -12,6 +12,12 @@ const METRICS = [
   "wb_cpi_annual",
   "wb_gdp_growth",
   "wb_fdi_pct_gdp",
+  "wb_employ_industry_pct",
+  "wb_employ_services_pct",
+  "wb_employ_agri_pct",
+  "wb_manufacturing_pct_gdp",
+  "wb_youth_unemployment",
+  "itviec_total_it_jobs",
 ];
 
 export default function Page() {
