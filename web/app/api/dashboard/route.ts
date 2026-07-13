@@ -25,6 +25,14 @@ const METRICS = [
   "wb_family_worker_pct",
   // Jobs
   "itviec_total_it_jobs",
+  // Price trend / Google Trends search interest
+  "trend_fuel_interest",
+  "trend_electricity_interest",
+  "trend_rice_interest",
+  "trend_pork_interest",
+  "trend_gold_interest",
+  // Fuel adjustment signal
+  "fuel_last_adjustment_flag",
 ];
 
 export const dynamic = "force-dynamic";

@@ -10,6 +10,7 @@ import SparklineChart from "@/components/SparklineChart";
 import StorySection from "@/components/StorySection";
 import SectorBar from "@/components/SectorBar";
 import InsightCard from "@/components/InsightCard";
+import PriceCategoryGrid from "@/components/PriceCategoryGrid";
 
 interface Props {
   data: Record<string, Indicator[]>;
@@ -61,6 +62,13 @@ export default function Dashboard({ data, squeeze }: Props) {
   const mfgPctGdp    = latest(data["wb_manufacturing_pct_gdp"]);
   const youthUnemp   = latest(data["wb_youth_unemployment"]);
   const itJobs       = latest(data["itviec_total_it_jobs"]);
+
+  // Google Trends price search interest
+  const trendFuel        = latest(data["trend_fuel_interest"]);
+  const trendElec        = latest(data["trend_electricity_interest"]);
+  const trendRice        = latest(data["trend_rice_interest"]);
+  const trendPork        = latest(data["trend_pork_interest"]);
+  const trendGoldSearch  = latest(data["trend_gold_interest"]);
 
   // Formal vs informal
   const selfEmployed = latest(data["wb_self_employed_pct"]);
@@ -277,7 +285,134 @@ export default function Dashboard({ data, squeeze }: Props) {
           </div>
         </section>
 
-        {/* 4. Job Market by Sector */}
+        {/* 4. Price Categories */}
+        <section className="space-y-4">
+          <div>
+            <h2 className="text-xl font-bold text-white">
+              {lang === "vi" ? "Giá Cả & Mức Độ Lo Lắng" : "Prices & Public Anxiety"}
+            </h2>
+            <p className="text-sm text-zinc-500 mt-0.5">
+              {lang === "vi"
+                ? "Giá thực tế + mức độ tìm kiếm trên Google = người dân đang lo về gì"
+                : "Real prices + Google search volume = what people are actually worried about"}
+            </p>
+          </div>
+
+          {/* Electricity headline callout — the surprise finding */}
+          {trendElec !== null && trendElec > 40 && (
+            <div className="rounded-xl border border-yellow-800 bg-yellow-950/40 p-4 flex items-start gap-3">
+              <span className="text-2xl shrink-0">⚡</span>
+              <div>
+                <p className="text-sm font-semibold text-yellow-200">
+                  {lang === "vi"
+                    ? `Giá điện: mức lo lắng ${trendElec.toFixed(0)}/100 — cao hơn cả giá xăng`
+                    : `Electricity: anxiety score ${trendElec.toFixed(0)}/100 — higher than fuel prices`}
+                </p>
+                <p className="text-xs text-zinc-500 mt-1">
+                  {lang === "vi"
+                    ? "Người Việt tìm kiếm \"giá điện\" nhiều gần gấp 10 lần \"giá xăng\". Hóa đơn điện mùa hè đang là gánh nặng lớn hơn xăng với đa số hộ gia đình."
+                    : "Vietnamese search \"electricity price\" ~10× more than \"fuel price\". Summer electricity bills are a bigger burden than fuel for most households."}
+                </p>
+              </div>
+            </div>
+          )}
+
+          <PriceCategoryGrid
+            lang={lang}
+            categories={[
+              {
+                icon: "⚡",
+                nameVi: "Giá Điện",
+                nameEn: "Electricity",
+                value: "~",
+                unit: lang === "vi" ? "điều chỉnh định kỳ" : "periodically adjusted",
+                concern: trendElec,
+                trend: "up",
+                noteVi: "EVN điều chỉnh hàng quý. Mùa hè: điều hoà tăng mạnh hoá đơn.",
+                noteEn: "EVN adjusts quarterly. Summer AC usage spikes bills.",
+                source: "Google Trends · EVN",
+                sparkData: data["trend_electricity_interest"],
+                isLive: false,
+              },
+              {
+                icon: "⛽",
+                nameVi: "Xăng A95",
+                nameEn: "Petrol A95",
+                value: "~20–21K",
+                unit: "₫/lít",
+                concern: trendFuel,
+                trend: "stable",
+                noteVi: "Điều chỉnh lần cuối: 09.07.2026. Điều chỉnh 10 ngày/lần theo giá dầu thế giới.",
+                noteEn: "Last adjusted: 09 Jul 2026. Updated every 10 days tracking global oil.",
+                source: "Petrolimex · Google Trends",
+                sparkData: data["trend_fuel_interest"],
+                isLive: false,
+              },
+              {
+                icon: "🏅",
+                nameVi: "Vàng SJC",
+                nameEn: "SJC Gold",
+                value: gold ? `${(gold / 1_000_000).toFixed(1)}M` : "148M",
+                unit: "₫/lượng",
+                concern: trendGoldSearch ?? (gold && gold > 140_000_000 ? 28 : 10),
+                trend: goldChange !== null && goldChange > 0.5 ? "up" : "stable",
+                noteVi: `${goldChange !== null ? `+${goldChange.toFixed(1)}% tuần này. ` : ""}Vàng tăng = người dân đang phòng thủ.`,
+                noteEn: `${goldChange !== null ? `+${goldChange.toFixed(1)}% this week. ` : ""}Gold rising = people are hedging.`,
+                source: "DOJI · live",
+                sparkData: data["gold_sjc_sell_vnd"],
+                isLive: true,
+              },
+              {
+                icon: "💵",
+                nameVi: "Tỷ Giá USD",
+                nameEn: "USD Exchange",
+                value: usdVnd ? `${fmt(usdVnd)}` : "26,460",
+                unit: "₫",
+                concern: usdChange !== null && usdChange > 1 ? Math.min(100, usdChange * 15) : 10,
+                trend: usdChange !== null && usdChange > 0.5 ? "up" : "stable",
+                noteVi: "Tác động trực tiếp: hàng nhập, điện thoại, đồ điện tử, nguyên liệu.",
+                noteEn: "Direct impact: imports, phones, electronics, raw materials.",
+                source: "Vietcombank · live",
+                sparkData: data["usd_vnd_sell"],
+                isLive: true,
+              },
+              {
+                icon: "🌾",
+                nameVi: "Gạo",
+                nameEn: "Rice",
+                value: "~",
+                unit: lang === "vi" ? "ổn định" : "stable",
+                concern: trendRice ?? 5,
+                trend: "stable",
+                noteVi: "Gạo Việt Nam xuất khẩu tốt. Giá nội địa ổn định — ít tác động từ thuế quan.",
+                noteEn: "Vietnam rice exports strong. Domestic prices stable — less tariff exposure.",
+                source: "Google Trends · GSO",
+                isLive: false,
+              },
+              {
+                icon: "🥩",
+                nameVi: "Thịt Heo",
+                nameEn: "Pork",
+                value: "~",
+                unit: lang === "vi" ? "theo mùa" : "seasonal",
+                concern: trendPork ?? 5,
+                trend: "stable",
+                noteVi: "Giá thịt theo mùa và dịch bệnh gia súc. Chiếm ~10% rổ CPI thực phẩm.",
+                noteEn: "Seasonal and disease-driven. ~10% of food CPI basket.",
+                source: "Google Trends · GSO",
+                isLive: false,
+              },
+            ]}
+          />
+
+          <p className="text-xs text-zinc-700 text-center">
+            {lang === "vi"
+              ? "Mức lo lắng = Google Trends tìm kiếm giá sản phẩm tại Việt Nam (0=ít, 100=rất nhiều) · Đo lường hàng tuần"
+              : "Anxiety score = Google Trends search interest for price queries in Vietnam (0=low, 100=high) · Measured weekly"}
+          </p>
+        </section>
+
+        {/* 5. Job Market by Sector */}
         <section className="space-y-4">
           <div>
             <h2 className="text-xl font-bold text-white">

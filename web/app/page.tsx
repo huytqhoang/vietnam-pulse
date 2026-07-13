@@ -22,6 +22,11 @@ const METRICS = [
   "wb_vulnerable_employ_pct",
   "wb_family_worker_pct",
   "itviec_total_it_jobs",
+  "trend_fuel_interest",
+  "trend_electricity_interest",
+  "trend_rice_interest",
+  "trend_pork_interest",
+  "trend_gold_interest",
 ];
 
 export default function Page() {
