@@ -1,0 +1,7 @@
+requests>=2.31
+beautifulsoup4>=4.12
+lxml>=4.9
+vnstock>=4.0.0
+pytest>=8.0
+pytest-timeout>=2.3
+responses>=0.25
